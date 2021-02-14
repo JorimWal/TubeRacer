@@ -5,6 +5,8 @@ using UnityEngine;
 [RequireComponent(typeof(MeshFilter))]
 public class Tube : MonoBehaviour
 {
+    public static Tube Instance;
+
     Mesh mesh;
     MeshFilter meshFilter;
 
@@ -16,11 +18,35 @@ public class Tube : MonoBehaviour
     [Tooltip("How many squares deep the tube is")]
     public int renderDistance = 25;
 
+    [HideInInspector]
+    public float speed = 1;
+
     Vector3[] vertices;
     int[] triangles;
     Vector3[] circle;
+    Vector3[] circleCenters;
     float tileSize;
-    float speed = 1;
+
+    private void Awake()
+    {
+        //Singleton Instance
+        if (Instance == null)
+            Instance = this;
+        else
+            Destroy(gameObject);
+
+        //Generate a circle with amount of points equal to tilesPerTube
+        circle = new Vector3[tilesPerTube];
+        circleCenters = new Vector3[tilesPerTube];
+        float angle = (2 * Mathf.PI) / tilesPerTube;
+        for (int i = 0; i < tilesPerTube; i++)
+        {
+            circle[i] = new Vector3(Mathf.Cos(angle * i), Mathf.Sin(angle * i), 0) * (tubeDiameter / 2f);
+            circleCenters[i] = new Vector3(Mathf.Cos((angle * i) + (0.5f * angle)), Mathf.Sin((angle * i) + (0.5f * angle)), 0) * (tubeDiameter / 2f);
+        }
+        tileSize = (circle[0] - circle[1]).magnitude;
+    }
+
 
     // Start is called before the first frame update
     void Start()
@@ -28,15 +54,6 @@ public class Tube : MonoBehaviour
         meshFilter = GetComponent<MeshFilter>();
         mesh = new Mesh();
         meshFilter.mesh = mesh;
-
-        //Generate a circle with amount of points equal to tilesPerTube
-        circle = new Vector3[tilesPerTube];
-        float angle = (2 * Mathf.PI) / tilesPerTube;
-        for (int i = 0; i < tilesPerTube; i++)
-        {
-            circle[i] = new Vector3(Mathf.Cos(angle * i), Mathf.Sin(angle * i), 0) * (tubeDiameter / 2f);
-        }
-        tileSize = (circle[0] - circle[1]).magnitude;
 
         GenerateInitialMesh(meshFilter.mesh);
     }
@@ -157,5 +174,15 @@ public class Tube : MonoBehaviour
         mesh.vertices = vertices;
         mesh.triangles = triangles;
         mesh.RecalculateNormals();
+    }
+
+    public void TranslateLocation(Transform translated, float depth, int tile, float height)
+    {
+        //TODO: Take rotation of tube into account
+        Vector3 newPosition = new Vector3(0, 0, depth * tileSize) + circleCenters[tile];
+        Vector3 upVector = new Vector3(0, 0, depth * tileSize) - newPosition;
+        newPosition += height * upVector.normalized;
+        translated.position = newPosition;
+        translated.up = upVector;
     }
 }
