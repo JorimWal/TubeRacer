@@ -110,7 +110,6 @@ public class Tube : MonoBehaviour
             newVertices[i] -= new Vector3(0, 0, speed * Time.deltaTime);
             if (newVertices[i].z < -1)
             {
-                Debug.Log($"Removed vertice {i}: {newVertices[i].ToString()}");
                 newVertices.RemoveAt(i);
             }
         }
@@ -129,7 +128,6 @@ public class Tube : MonoBehaviour
             {
                 newVertices.Add(newCircleCenter + circle[i]);
             }
-            Debug.Log($"Added new circle at z: {newVertices[newVertices.Count - 1].z}");
             circlesAmount++;
         }
 
