@@ -35,12 +35,13 @@ public class LevelController : MonoBehaviour
     {
         while (true)
         {
-            SpawnObject(tunnelLight, 25, Tube.Instance.tubeDiameter / 2);
+            GameObject light = SpawnObject(tunnelLight, 25, Tube.Instance.tubeDiameter / 2);
+            light.AddComponent<DimLight>();
             yield return new WaitForSeconds(3);
         }
     }
 
-    void SpawnObject(GameObject prefab, float depth, float height)
+    GameObject SpawnObject(GameObject prefab, float depth, float height)
     {
         int tile = Random.Range(0, Tube.Instance.tilesPerTube);
         GameObject instance = GameObject.Instantiate(prefab);
@@ -49,5 +50,6 @@ public class LevelController : MonoBehaviour
         scriptInstance.depth = depth;
         scriptInstance.height = height;
         Tube.Instance.TranslateLocation(instance.transform, scriptInstance.depth, tile, scriptInstance.height);
+        return instance;
     }
 }

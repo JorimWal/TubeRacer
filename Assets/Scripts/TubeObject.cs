@@ -20,7 +20,7 @@ public class TubeObject : MonoBehaviour
         depth -= speedModifier * Tube.Instance.speed * Time.deltaTime;
         //Let the tube translate the object to match the curve
         Tube.Instance.TranslateLocation(transform, depth, tile, height);
-        if (transform.position.z < -2)
-            Destroy(gameObject);
+        if (transform.position.z < -1)
+            Destroy(gameObject, 5);
     }
 }
