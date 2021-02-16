@@ -26,6 +26,10 @@ public class Tube : MonoBehaviour
     Vector3[] circle;
     Vector3[] circleCenters;
     float tileSize;
+    List<(Vector3, float)> curve = new List<(Vector3, float)>();
+
+    //DEBUG
+    LineRenderer lineRenderer;
 
     private void Awake()
     {
@@ -45,6 +49,9 @@ public class Tube : MonoBehaviour
             circleCenters[i] = new Vector3(Mathf.Cos((angle * i) + (0.5f * angle)), Mathf.Sin((angle * i) + (0.5f * angle)), 0) * (tubeDiameter / 2f);
         }
         tileSize = (circle[0] - circle[1]).magnitude;
+
+        //DEBUG
+        lineRenderer = GetComponent<LineRenderer>();
     }
 
 
@@ -62,6 +69,39 @@ public class Tube : MonoBehaviour
     void Update()
     {
         UpdateMesh();
+
+        while(curve.Count < renderDistance)
+        {
+            if(curve.Count == 0)
+            {
+                curve.Add((new Vector3(0, 0, 1) * tileSize, 1));
+            }
+            else
+            {
+                float randomXRotation = Random.Range(-5f, 5f);
+                float randomYRotation = Random.Range(-5f, 5f);
+                Quaternion rotation = Quaternion.Euler(randomXRotation, randomYRotation, 0);
+                Vector3 newdirection = rotation * curve[curve.Count - 1].Item1;
+                curve.Add((newdirection, curve.Count));
+            }
+        }
+
+        curve[0] = (Vector3.RotateTowards(curve[0].Item1, Vector3.forward, Mathf.PI / 8 * Time.deltaTime, 0), curve[0].Item2);
+        for (int i = 1; i < curve.Count; i++)
+        {
+            curve[i] = (Vector3.RotateTowards(curve[i].Item1, curve[i-1].Item1, Mathf.PI / 8 * Time.deltaTime, 0), curve[i].Item2); 
+        }
+
+        List<Vector3> additiveCurve = new List<Vector3>();
+        additiveCurve.Add(curve[0].Item1);
+        for(int i = 1; i < curve.Count; i++)
+        {
+            additiveCurve.Add(curve[i].Item1 + additiveCurve[i - 1]);
+        }
+
+
+        lineRenderer.positionCount = additiveCurve.Count;
+        lineRenderer.SetPositions(additiveCurve.ToArray());
     }
 
     void GenerateInitialMesh(Mesh mesh)
@@ -159,11 +199,11 @@ public class Tube : MonoBehaviour
             for (int i = 0; i < circle.Length; i++)
             {
                 int triangleIndex = ((z - 1) * circle.Length * 2 * 3) + (i * 2 * 3);
-                //Triangle 012
+                //Triangle 032
                 triangles[triangleIndex + 0] = (z * circle.Length) + i;
                 triangles[triangleIndex + 1] = ((z - 1) * circle.Length) + ((i + 1) % circle.Length);
                 triangles[triangleIndex + 2] = ((z - 1) * circle.Length) + i;
-                //Triangle 213
+                //Triangle 013
                 triangles[triangleIndex + 3] = (z * circle.Length) + i;
                 triangles[triangleIndex + 4] = (z * circle.Length) + ((i + 1) % circle.Length);
                 triangles[triangleIndex + 5] = ((z - 1) * circle.Length) + ((i + 1) % circle.Length);
