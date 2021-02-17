@@ -149,8 +149,8 @@ public struct Torus
         float nextInnerSegmentRadius = Mathf.Ceil(innerSegments) * radiansPerInnerSegment;
         float innerDifference = innerSegments % 1;
 
-        Vector3 lastSegmentedPoint = PointOnTorus(lastOuterSegmentRadius, lastInnerSegmentRadius);
-        Vector3 nextSegmentedPoint = PointOnTorus(nextOuterSegmentRadius, nextInnerSegmentRadius);
+        Vector3 lastSegmentedPoint = PointOnTorus(lastOuterSegmentRadius, angle2);
+        Vector3 nextSegmentedPoint = PointOnTorus(nextOuterSegmentRadius, angle2);
 
         output.x = Mathf.Lerp(lastSegmentedPoint.x, nextSegmentedPoint.x, outerDifference);
         output.y = Mathf.Lerp(lastSegmentedPoint.y, nextSegmentedPoint.y, outerDifference);
