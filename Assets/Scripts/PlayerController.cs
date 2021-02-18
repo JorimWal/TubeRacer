@@ -59,8 +59,6 @@ public class PlayerController : MonoBehaviour
     void UpdatePlayerPosition()
     {
         //Get the point on a segmented torus of the tube segment
-        //Vector3 newTorusPoint = currentTube.Torus.PointOnSegmentedTorus(radiansTravelledInCurrentTube, angle, currentTube.Segments, TubeSystem.Instance.TubeSegments);
-        //Vector3 estimatedNextTorusPoint = currentTube.Torus.PointOnSegmentedTorus(radiansTravelledInCurrentTube + (speedInRadians * Time.deltaTime), angle, currentTube.Segments, TubeSystem.Instance.TubeSegments);
         Vector3 newTorusPoint = currentTube.Torus.PointOnTorus(radiansTravelledInCurrentTube, angle);
         Vector3 estimatedNextTorusPoint = currentTube.Torus.PointOnTorus(radiansTravelledInCurrentTube + (speedInRadians * Time.deltaTime), angle);
         //Transform that to world coordinates
@@ -70,6 +68,7 @@ public class PlayerController : MonoBehaviour
         Vector3 curveCenter = currentTube.transform.TransformPoint(currentTube.Torus.PointOnCurve(radiansTravelledInCurrentTube));
         Vector3 up = (curveCenter - newPosition).normalized;
         Vector3 forward = (estimatedNextPosition - newPosition).normalized;
+
         transform.rotation = Quaternion.LookRotation(forward, up);
         transform.position = newPosition;
         transform.position += up * transform.localScale.y * 0.5f;

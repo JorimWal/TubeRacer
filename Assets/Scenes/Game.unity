@@ -416,6 +416,8 @@ MonoBehaviour:
   CurveSegments: 50
   TubeSegments: 20
   SegmentsCapacity: 6
+  MinimumMajorRadius: 25
+  MaximumMajorRadius: 45
 --- !u!4 &1391468491
 Transform:
   m_ObjectHideFlags: 0

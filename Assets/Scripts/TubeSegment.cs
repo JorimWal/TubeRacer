@@ -4,22 +4,17 @@ using UnityEngine;
 
 public class TubeSegment : MonoBehaviour
 {
-    MeshFilter meshFilter;
-    Mesh mesh;
 
-    public float ringDistance = 1;
-    int tubeIncrement = 12;
-    float minorRadius = 1;
     public Torus Torus { get; private set; }
 
+    [HideInInspector]
     public Transform pivot;
+    [HideInInspector]
     public Transform connector;
 
     public int Segments { get; private set; } = 6;
 
     public int CurveSegments { get; private set; } = 12;
-
-    public float MajorRadius { get; private set; } = 4;
 
     public float RadiansCovered { get; private set; }
 
@@ -30,6 +25,17 @@ public class TubeSegment : MonoBehaviour
             return RadiansCovered * MajorRadius * Mathf.PI * 2;
         }
     }
+
+    public float MajorRadius { get; private set; }
+
+    float minorRadius;
+    int tubeIncrement = 12;
+
+    //local scripts
+    MeshFilter meshFilter;
+    Mesh mesh;
+
+
 
     private void Awake()
     {

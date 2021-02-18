@@ -18,6 +18,10 @@ public class TubeSystem : MonoBehaviour
     public int TubeSegments = 16;
     [Tooltip("The amount of segments the system keeps loaded simultaneously")]
     public int SegmentsCapacity = 5;
+    [Tooltip("The minimum radius of the tube.")]
+    public int MinimumMajorRadius = 25;
+    [Tooltip("The maximum radius of the tube")]
+    public int MaximumMajorRadius = 45;
 
     GameObject tubeSegmentPrefab;
     GameObject obstaclePrefab;
@@ -44,12 +48,6 @@ public class TubeSystem : MonoBehaviour
             AddSegment();
         }
 
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 
     public void RemoveSegment()
@@ -84,18 +82,21 @@ public class TubeSystem : MonoBehaviour
 
         //Get a random range for the Major radius
         //The smaller the radius, the sharper the corners
-        float radius = Random.Range(25, 45);
+        float radius = Random.Range(MinimumMajorRadius, MaximumMajorRadius);
         //Get a random range for the amount of segments in the torus
         //Fewer segments lead to more frequent direction changes in the turning of the tube
         int segments = Random.Range(4, 9);
+        //Pass the tube variables along so the created segment can create a mesh
         tubeScript.SetTorus(segments, CurveSegments, TubeSegments, radius + (Diameter / 2), (Diameter / 2), randomRotation);
         tubes.Add(tubeScript);
 
+        //Parent the newly created tube to the existing tube system
         if (tubes.Count > 1)
         {
             AllignSegments(tubes[tubes.Count - 2], tubes[tubes.Count - 1]);
         }
 
+        //Spawn random obstacles in the tube
         int ObstacleCount = Random.Range(0, 8);
         for(int i = 0; i < ObstacleCount; i++)
         {
@@ -113,6 +114,5 @@ public class TubeSystem : MonoBehaviour
     void AllignSegments(TubeSegment OriginTube, TubeSegment AlligningTube)
     {
         AlligningTube.pivot.SetParent(OriginTube.connector, false);
-        //AlligningTube.transform.SetParent(transform);
     }
 }
