@@ -132,7 +132,8 @@ public class PlayerController : MonoBehaviour
         }
         else if (other.gameObject.tag == "HeartPickup")
         {
-            Lives++;
+            if(Lives< 3)
+                Lives++;
             Destroy(other.gameObject);
         }
     }
