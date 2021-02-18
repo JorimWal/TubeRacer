@@ -25,21 +25,15 @@ public class TubeSegment : MonoBehaviour
 
     public float Rotation { get; private set; }
 
+    public float CurveLength {
+        get {
+            return RadiansCovered * MajorRadius * Mathf.PI * 2;
+        }
+    }
+
     private void Awake()
     {
         meshFilter = GetComponent<MeshFilter>();
-    }
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 
     public void SetTorus(int Segments, int CurveIncrement, int TubeIncrement, float MajorRadius, float MinorRadius, float Rotation)
@@ -128,36 +122,6 @@ public struct Torus
         output.x = r * Mathf.Cos(angle1);
         output.y = r * Mathf.Sin(angle1);
         output.z = MinorRadius * Mathf.Sin(angle2);
-        return output;
-    }
-
-    public Vector3 PointOnSegmentedTorus(float angle1, float angle2, float segments1, float segments2)
-    {
-        Vector3 output = Vector3.zero;
-
-        //Calculate the radians per Curve Segment
-        float radiansPerOuterSegment = (2 * Mathf.PI) / segments1;
-        //Calculate the radians per InnerCircle Segment
-        float radiansPerInnerSegment = (2 * Mathf.PI) / segments2;
-
-        //Find the closest segmented angle on either side of the precise angle
-        float outerSegments = angle1 / radiansPerOuterSegment;
-        float lastOuterSegmentRadius = Mathf.Floor(outerSegments) * radiansPerOuterSegment;
-        float nextOuterSegmentRadius = Mathf.Ceil(outerSegments) * radiansPerOuterSegment;
-        float outerDifference = outerSegments % 1;
-
-        //Find the closest segmented angle on either side of the precise inner angle
-        float innerSegments = angle2 / radiansPerInnerSegment;
-        float lastInnerSegmentRadius = Mathf.Floor(innerSegments) * radiansPerInnerSegment;
-        float nextInnerSegmentRadius = Mathf.Ceil(innerSegments) * radiansPerInnerSegment;
-        float innerDifference = innerSegments % 1;
-
-        Vector3 lastSegmentedPoint = PointOnTorus(lastOuterSegmentRadius, angle2);
-        Vector3 nextSegmentedPoint = PointOnTorus(nextOuterSegmentRadius, angle2);
-
-        output.x = Mathf.Lerp(lastSegmentedPoint.x, nextSegmentedPoint.x, outerDifference);
-        output.y = Mathf.Lerp(lastSegmentedPoint.y, nextSegmentedPoint.y, outerDifference);
-        output.z = Mathf.Lerp(lastSegmentedPoint.z, nextSegmentedPoint.z, innerDifference);
         return output;
     }
 

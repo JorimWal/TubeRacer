@@ -12,6 +12,8 @@ public class TubeSystem : MonoBehaviour
 
     [Tooltip("The diameter of the inner tubes created by the system")]
     public float Diameter = 15;
+    [Tooltip("The amount of faces of the outer circle")]
+    public int CurveSegments = 50;
     [Tooltip("The amount of faces of the inner tubes")]
     public int TubeSegments = 16;
     [Tooltip("The amount of segments the system keeps loaded simultaneously")]
@@ -86,7 +88,7 @@ public class TubeSystem : MonoBehaviour
         //Get a random range for the amount of segments in the torus
         //Fewer segments lead to more frequent direction changes in the turning of the tube
         int segments = Random.Range(4, 9);
-        tubeScript.SetTorus(segments, 50, TubeSegments, radius + (Diameter / 2), (Diameter / 2), randomRotation);
+        tubeScript.SetTorus(segments, CurveSegments, TubeSegments, radius + (Diameter / 2), (Diameter / 2), randomRotation);
         tubes.Add(tubeScript);
 
         if (tubes.Count > 1)

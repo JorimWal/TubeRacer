@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
@@ -10,6 +11,9 @@ public class PlayerController : MonoBehaviour
     [Tooltip("Radians per second of the tube's inner circle the player covers.")]
     public float turnAngle = 1.5f;
 
+    public float Score { get; private set; } = 0;
+    public int Lives { get; private set; } = 3;
+
     TubeSegment currentTube;
     float radiansTravelledInCurrentTube = 0;
     float angle = 0;
@@ -17,15 +21,19 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        HandleInput();
+        if(Lives > 0)
+            HandleInput();
 
         currentTube = TubeSystem.Instance.tubes[1];
         radiansTravelledInCurrentTube += speedInRadians * Time.deltaTime;
+        if(Lives > 0)
+            Score += speedInRadians * Time.deltaTime * (currentTube.CurveLength / (2 * Mathf.PI));
         if(radiansTravelledInCurrentTube > currentTube.RadiansCovered)
         {
             radiansTravelledInCurrentTube -= currentTube.RadiansCovered;
@@ -65,5 +73,50 @@ public class PlayerController : MonoBehaviour
         transform.rotation = Quaternion.LookRotation(forward, up);
         transform.position = newPosition;
         transform.position += up * transform.localScale.y * 0.5f;
+    }
+
+    IEnumerator GameOver()
+    {
+        PlayerPrefs.SetInt("EditLeaderboardEntryIndex", -1);
+
+        var leaderBoard = Leaderboard.GetLeaderboard();
+        string[] names = leaderBoard.Item1;
+        int[] scores = leaderBoard.Item2;
+
+        //Place the player's score on the leaderboard
+        for(int i = 9; i >= 0; i--)
+        {
+            //If there is a higher score and that score is lower than the currently iterated score, bump this score down one
+            if(i >= 1 && scores[i-1] < Score)
+            {
+                names[i] = names[i - 1];
+                scores[i] = scores[i - 1];
+            }
+            else if(scores[i] < Score)
+            {
+                names[i] = " ";
+                scores[i] = (int)Score;
+                PlayerPrefs.SetInt("EditLeaderboardEntryIndex", i);
+            }
+        }
+
+        Leaderboard.SetLeaderboard(names, scores);
+
+        //Turn of the model to show the player has died
+        Model.gameObject.SetActive(false);
+
+        //Wait for a few seconds before switching scenes so the player can see they died
+        yield return new WaitForSeconds(1.5f);
+        SceneManager.LoadScene("ScoreScreen");
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if(other.gameObject.tag == "Obstacle")
+        {
+            Lives--;
+            if (Lives <= 0)
+                StartCoroutine(GameOver());
+        }
     }
 }
