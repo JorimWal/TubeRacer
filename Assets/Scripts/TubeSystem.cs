@@ -101,9 +101,9 @@ public class TubeSystem : MonoBehaviour
             float curveAngle = Random.Range(0, tubeScript.RadiansCovered);
             GameObject obstacle = Instantiate(obstaclePrefab);
             obstacle.transform.SetParent(tubeScript.transform);
-            Vector3 newPosition = tubeScript.Torus.PointOnTorus(curveAngle, angle);
-            Vector3 newCenter = tubeScript.Torus.PointOnCurve(curveAngle);
-            obstacle.transform.localPosition = newPosition;
+            Vector3 newPosition = tubeScript.transform.TransformPoint(tubeScript.Torus.PointOnTorus(curveAngle, angle));
+            Vector3 newCenter = tubeScript.transform.TransformPoint(tubeScript.Torus.PointOnCurve(curveAngle));
+            obstacle.transform.position = newPosition;
             obstacle.transform.up = (newCenter - newPosition).normalized;
         }
     }
