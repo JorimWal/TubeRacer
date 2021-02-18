@@ -66,10 +66,6 @@ public class TubeSystem : MonoBehaviour
         //Reset the system to position 0, so the player stays near the origin
         nextTube.transform.localPosition = Vector3.zero;
         AddSegment();
-
-        //DEBUG
-        for (int i = 1; i < tubes.Count; i++)
-            AllignSegments(tubes[i - 1], tubes[i]);
     }
 
     public void AddSegment()
@@ -81,6 +77,7 @@ public class TubeSystem : MonoBehaviour
         instance.transform.SetParent(pivot.transform, false);
         pivot.transform.SetParent(transform, false);
         float randomRotation = Random.Range(0, TubeSegments) * (360 / (float)TubeSegments);
+        //float randomRotation = 0;
         pivot.transform.localRotation = Quaternion.Euler(0, randomRotation, 0);
 
         //Get a random range for the Major radius
@@ -89,7 +86,7 @@ public class TubeSystem : MonoBehaviour
         //Get a random range for the amount of segments in the torus
         //Fewer segments lead to more frequent direction changes in the turning of the tube
         int segments = Random.Range(4, 9);
-        tubeScript.SetTorus(segments, 50, TubeSegments, radius + (Diameter / 2), (Diameter / 2));
+        tubeScript.SetTorus(segments, 50, TubeSegments, radius + (Diameter / 2), (Diameter / 2), randomRotation);
         tubes.Add(tubeScript);
 
         if (tubes.Count > 1)

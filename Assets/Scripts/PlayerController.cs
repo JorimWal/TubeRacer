@@ -31,6 +31,9 @@ public class PlayerController : MonoBehaviour
             radiansTravelledInCurrentTube -= currentTube.RadiansCovered;
             TubeSystem.Instance.RemoveSegment();
             currentTube = TubeSystem.Instance.tubes[1];
+            //Offset the angle by the rotation of the new pipe, so the player re-enters in the right position
+            float offsetInRadians = (currentTube.Rotation / 360) * 2 * Mathf.PI;
+            angle = (angle + offsetInRadians) % (2 * Mathf.PI);
         }
         UpdatePlayerPosition();
     }

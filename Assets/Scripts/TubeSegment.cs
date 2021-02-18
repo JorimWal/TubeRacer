@@ -23,6 +23,8 @@ public class TubeSegment : MonoBehaviour
 
     public float RadiansCovered { get; private set; }
 
+    public float Rotation { get; private set; }
+
     private void Awake()
     {
         meshFilter = GetComponent<MeshFilter>();
@@ -40,13 +42,14 @@ public class TubeSegment : MonoBehaviour
         
     }
 
-    public void SetTorus(int Segments, int CurveIncrement, int TubeIncrement, float MajorRadius, float MinorRadius)
+    public void SetTorus(int Segments, int CurveIncrement, int TubeIncrement, float MajorRadius, float MinorRadius, float Rotation)
     {
         this.Segments = Segments + 1;
         CurveSegments = CurveIncrement;
         tubeIncrement = TubeIncrement;
         this.MajorRadius = MajorRadius;
         minorRadius = MinorRadius;
+        this.Rotation = Rotation;
 
         GenerateMesh();
 
@@ -60,7 +63,7 @@ public class TubeSegment : MonoBehaviour
         //Set the connector object at the center of the end pipe
         connector.localPosition = Torus.PointOnCurve(curveAngle * Segments);
         //Turn the connector to face out the pipe
-        connector.localRotation = Quaternion.Euler((Segments / (float)CurveSegments) * 360f, -90, 0);
+        connector.localRotation = Quaternion.Euler(0, 0, (Segments / (float)CurveSegments) * 360f);
         RadiansCovered = Segments * curveAngle;
     }
 
