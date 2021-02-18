@@ -5,6 +5,8 @@ using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
+    public static PlayerController Instance;
+
     public Transform Model;
     [Tooltip("Radians per second of the tube's curve the player covers.")]
     public float speedInRadians = 0.25f;
@@ -12,16 +14,20 @@ public class PlayerController : MonoBehaviour
     public float turnAngle = 1.5f;
 
     public float Score { get; private set; } = 0;
+    public int ScoreMultiplier { get; private set; } = 1;
     public int Lives { get; private set; } = 3;
 
     TubeSegment currentTube;
     float radiansTravelledInCurrentTube = 0;
     float angle = 0;
 
-    // Start is called before the first frame update
-    void Start()
+    private void Awake()
     {
-
+        //Singleton Instance
+        if (Instance == null)
+            Instance = this;
+        else
+            Destroy(gameObject);
     }
 
     // Update is called once per frame
@@ -33,7 +39,7 @@ public class PlayerController : MonoBehaviour
         currentTube = TubeSystem.Instance.tubes[1];
         radiansTravelledInCurrentTube += speedInRadians * Time.deltaTime;
         if(Lives > 0)
-            Score += speedInRadians * Time.deltaTime * (currentTube.CurveLength / (2 * Mathf.PI));
+            Score += speedInRadians * Time.deltaTime * (currentTube.CurveLength / (2 * Mathf.PI)) * ScoreMultiplier;
         if(radiansTravelledInCurrentTube > currentTube.RadiansCovered)
         {
             radiansTravelledInCurrentTube -= currentTube.RadiansCovered;
@@ -114,8 +120,20 @@ public class PlayerController : MonoBehaviour
         if(other.gameObject.tag == "Obstacle")
         {
             Lives--;
+            ScoreMultiplier = 1;
             if (Lives <= 0)
                 StartCoroutine(GameOver());
+        }
+        else if(other.gameObject.tag == "ScorePickup")
+        {
+            if (ScoreMultiplier < 8)
+                ScoreMultiplier = ScoreMultiplier * 2;
+            Destroy(other.gameObject);
+        }
+        else if (other.gameObject.tag == "HeartPickup")
+        {
+            Lives++;
+            Destroy(other.gameObject);
         }
     }
 }

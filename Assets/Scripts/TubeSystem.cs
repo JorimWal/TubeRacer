@@ -23,8 +23,7 @@ public class TubeSystem : MonoBehaviour
     [Tooltip("The maximum radius of the tube")]
     public int MaximumMajorRadius = 45;
 
-    GameObject tubeSegmentPrefab;
-    GameObject obstaclePrefab;
+    GameObject tubeSegmentPrefab, obstaclePrefab, scorePickupPrefab, heartPickupPrefab;
 
     private void Awake()
     {
@@ -38,10 +37,11 @@ public class TubeSystem : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        //Load the segment prefab from resources
+        //Load the prefabs from resources
         tubeSegmentPrefab = Resources.Load<GameObject>("Prefabs/TubeSegment");
-        //Load the obstacle prefab from resources
         obstaclePrefab = Resources.Load<GameObject>("Prefabs/Obstacle");
+        scorePickupPrefab = Resources.Load<GameObject>("Prefabs/ScorePickup");
+        heartPickupPrefab = Resources.Load<GameObject>("Prefabs/HeartPickup");
 
         for(int i = 0; i < SegmentsCapacity; i++)
         {
@@ -99,16 +99,29 @@ public class TubeSystem : MonoBehaviour
         //Spawn random obstacles in the tube
         int ObstacleCount = Random.Range(0, 8);
         for(int i = 0; i < ObstacleCount; i++)
-        {
-            float angle = Random.Range(0, 2 * Mathf.PI);
-            float curveAngle = Random.Range(0, tubeScript.RadiansCovered);
-            GameObject obstacle = Instantiate(obstaclePrefab);
-            obstacle.transform.SetParent(tubeScript.transform);
-            Vector3 newPosition = tubeScript.transform.TransformPoint(tubeScript.Torus.PointOnTorus(curveAngle, angle));
-            Vector3 newCenter = tubeScript.transform.TransformPoint(tubeScript.Torus.PointOnCurve(curveAngle));
-            obstacle.transform.position = newPosition;
-            obstacle.transform.up = (newCenter - newPosition).normalized;
-        }
+            SpawnObject(tubeScript, obstaclePrefab);
+
+        //Spawn hearts when the player is hurt
+        int heartChance = Random.Range(0, 10);
+        if(heartChance == 0 && PlayerController.Instance.Lives < 3)
+            SpawnObject(tubeScript, heartPickupPrefab);
+
+        //Spawn score pickup if the score multiplier is not yet maxed out
+        int scorePickupChance = Random.Range(0, 10);
+        if (scorePickupChance == 0 && PlayerController.Instance.ScoreMultiplier < 8)
+            SpawnObject(tubeScript, scorePickupPrefab);
+    }
+
+    void SpawnObject(TubeSegment tubeScript, GameObject prefab)
+    {
+        float angle = Random.Range(0, 2 * Mathf.PI);
+        float curveAngle = Random.Range(0, tubeScript.RadiansCovered);
+        GameObject obstacle = Instantiate(prefab);
+        obstacle.transform.SetParent(tubeScript.transform);
+        Vector3 newPosition = tubeScript.transform.TransformPoint(tubeScript.Torus.PointOnTorus(curveAngle, angle));
+        Vector3 newCenter = tubeScript.transform.TransformPoint(tubeScript.Torus.PointOnCurve(curveAngle));
+        obstacle.transform.position = newPosition;
+        obstacle.transform.up = (newCenter - newPosition).normalized;
     }
 
     void AllignSegments(TubeSegment OriginTube, TubeSegment AlligningTube)
